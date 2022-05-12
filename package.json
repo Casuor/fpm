@@ -1,0 +1,32 @@
+{
+  "name": "@aki/fpm",
+  "version": "0.1.0",
+  "description": "A cli to fetch project template with Node.js",
+  "main": "src/cli.js",
+  "bin": {
+    "@aki/fpm": "bin/fpm",
+    "fpm": "bin/fpm"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "cli",
+    "node"
+  ],
+  "author": "aki",
+  "license": "ISC",
+  "dependencies": {
+    "arg": "^5.0.1",
+    "chalk": "^4.1.2",
+    "esm": "^3.2.25",
+    "execa": "^5.1.1",
+    "inquirer": "^8.2.4",
+    "listr": "^0.14.3",
+    "ncp": "^2.0.0",
+    "pkg-install": "^1.0.0"
+  }
+}
