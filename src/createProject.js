@@ -1,33 +1,18 @@
-import chalk from "chalk";
+import logInfo from "../lib/logInfo";
+
+const chalk = require("chalk");
 import fs from 'fs';
-import ncp from 'ncp';
 import path from 'path';
 import {promisify} from 'util';
-import execa from "execa";
 import {projectInstall} from 'pkg-install';
 import Listr from 'listr';
+import copyTemplateFiles from "../lib/copyTemplateFiles";
+import initGit from "../lib/initGit";
 
 const access = promisify(fs.access);
-const copy = promisify(ncp);
 const {log, error} = console
 
-async function copyTemplateFiles(options) {
-  return copy(options.templateDirectory, options.targetDirectory, {
-    clobber: false
-  });
-}
-
-async function initGit(options) {
-  const result = await execa('git', ['init'], {
-    cwd: options.templateDirectory,
-  });
-  if (result.failed) {
-    return Promise.reject(new Error("Failed to initialize git"));
-  }
-  return;
-}
-
-async function createProject(options) {
+export default async function createProject(options) {
   options = {
     ...options, targetDirectory: options.targetDirectory || process.cwd(),
   };
@@ -41,8 +26,6 @@ async function createProject(options) {
     process.exit(1);
   }
 
-  // log('Copying template files...');
-  // await copyTemplateFiles(options);
   const tasks = new Listr([{
     title: 'Copy Project Files...', task: () => {
       copyTemplateFiles(options);
@@ -53,16 +36,23 @@ async function createProject(options) {
     }, enabled: () => options.git
   }, {
     title: "Install dependencies",
-    task: () => projectInstall({
-      cwd: options.targetDirectory,
-    }),
-    skip: () => !options.runInstall ? `type --install/-i  to automatically install dependencies` : undefined,
+    task: async () => {
+      await projectInstall({
+        prefer: 'npm',
+      });
+    },
+    // task: () =>  projectInstall({
+    //   cwd: options.targetDirectory,
+    // }).catch(error => {
+    //   log(error)
+    // }),
+    // skip: () => false
+    // skip: () => !options.installDeps ? `type --install/-i  to automatically install dependencies` : undefined,
   }], {
     exitOnError: false,
   })
   await tasks.run();
-  log("%s Project Ready", chalk.greenBright.bold('DONE!'));
+  logInfo(" Project Ready,DONE!")
+  // log("%s Project Ready", chalk.greenBright.bold('DONE! Enioy it'));
   return true;
 }
-
-export default createProject
