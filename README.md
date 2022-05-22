@@ -11,7 +11,7 @@
 ### details
 
 ```shell
-fpm [options]
+fpm init [options]
     -g/--git  # init git repo
     -y/--yes  # skip prompt
     -i/--install # install deps
