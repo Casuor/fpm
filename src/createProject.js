@@ -26,33 +26,30 @@ export default async function createProject(options) {
     process.exit(1);
   }
 
-  const tasks = new Listr([{
-    title: 'Copy Project Files...', task: () => {
-      copyTemplateFiles(options);
-    }
-  }, {
-    title: "Initialize Git", task: () => {
-      initGit(options)
-    }, enabled: () => options.git
-  }, {
-    title: "Install dependencies",
-    task: async () => {
-      await projectInstall({
-        prefer: 'npm',
-      });
+  const tasks = new Listr([
+    {
+      title: 'Copy Project Files...', task: () => {
+        copyTemplateFiles(options);
+      }
     },
-    // task: () =>  projectInstall({
-    //   cwd: options.targetDirectory,
-    // }).catch(error => {
-    //   log(error)
-    // }),
-    // skip: () => false
-    // skip: () => !options.installDeps ? `type --install/-i  to automatically install dependencies` : undefined,
-  }], {
+    {
+      title: "Initialize Git", task: () => {
+        initGit(options)
+      },
+      enabled: () => options.git
+    },
+    {
+      title: "Install dependencies",
+      task: async () => {
+        await projectInstall({
+          cwd: options.targetDirectory,
+        });
+      },
+      skip: () => options.installDeps ? false : `$type --install/-i  to automatically install dependencies`
+    }], {
     exitOnError: false,
   })
   await tasks.run();
-  logInfo(" Project Ready,DONE!")
-  // log("%s Project Ready", chalk.greenBright.bold('DONE! Enioy it'));
+  logInfo(" Project Ready,DONE! Enjoy it!", 'success')
   return true;
 }
